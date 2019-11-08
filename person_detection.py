@@ -1,18 +1,18 @@
-######## Raspberry Pi Pet Detector Camera using TensorFlow Object Detection API #########
+######## Raspberry Pi Person Detection Camera using TensorFlow Object Detection API #########
 #
-# Author: Evan Juras
-# Date: 10/15/18
+# Author: David Adkins and Lakshmi Chaitanya Chipala
+# Date: 11/8/19
 # Description:
 #
-# This script implements a "pet detector" that alerts the user if a pet is
+# This script implements a "person detector" that alerts the user if a person is
 # waiting to be let inside or outside. It takes video frames from a Picamera
-# or USB webcam, passes them through a TensorFlow object detection model,
-# determines if a cat or dog has been detected in the image, checks the location
-# of the cat or dog in the frame, and texts the user's phone if a cat or dog is
-# detected in the appropriate location.
+# passes them through a TensorFlow object detection model, determines if a person 
+# has been detected in the image, and texts the user's phone if a cat or dog is detected 
+# in the appropriate location.
 #
-# The framework is based off the Object_detection_picamera.py script located here:
-# https://github.com/EdjeElectronics/TensorFlow-Object-Detection-on-the-Raspberry-Pi/blob/master/Object_detection_picamera.py
+# The framework is based off the Object_detection_picamera.py and the Pet-Detection.py script 
+# located here:
+# https://github.com/EdjeElectronics/TensorFlow-Object-Detection-on-the-Raspberry-Pi
 #
 # Sending a text requires setting up a Twilio account (free trials are available).
 # Here is a good tutorial for using Twilio:
@@ -93,7 +93,7 @@ category_index = label_map_util.create_category_index(categories)
 detection_graph = tf.Graph()
 with detection_graph.as_default():
     od_graph_def = tf.GraphDef()
-    with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
+    with tf.io.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
         serialized_graph = fid.read()
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')
@@ -126,19 +126,13 @@ freq = cv2.getTickFrequency()
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 # Define inside box coordinates (top left and bottom right)
-TL_inside = (int(IM_WIDTH*0.1),int(IM_HEIGHT*0.35))
-BR_inside = (int(IM_WIDTH*0.45),int(IM_HEIGHT-5))
-
-# Define outside box coordinates (top left and bottom right)
-TL_outside = (int(IM_WIDTH*0.46),int(IM_HEIGHT*0.25))
-BR_outside = (int(IM_WIDTH*0.8),int(IM_HEIGHT*.85))
+top_left = (0,0)
+bottom_right = (IM_WIDTH,IM_HEIGHT)
 
 # Initialize control variables used for pet detector
-detected_inside = False
-detected_outside = False
+detected = False
 
 inside_counter = 0
-outside_counter = 0
 
 pause = 0
 pause_counter = 0
@@ -147,11 +141,11 @@ pause_counter = 0
 
 # This function contains the code to detect a pet, determine if it's
 # inside or outside, and send a text to the user's phone.
-def pet_detector(frame):
+def person_detector(frame):
 
     # Use globals for the control variables so they retain their value after function exits
-    global detected_inside, detected_outside
-    global inside_counter, outside_counter
+    global detected
+    global inside_counter
     global pause, pause_counter
 
     frame_expanded = np.expand_dims(frame, axis=0)
@@ -173,10 +167,8 @@ def pet_detector(frame):
         min_score_thresh=0.40)
 
     # Draw boxes defining "outside" and "inside" locations.
-    cv2.rectangle(frame,TL_outside,BR_outside,(255,20,20),3)
-    cv2.putText(frame,"Outside box",(TL_outside[0]+10,TL_outside[1]-10),font,1,(255,20,255),3,cv2.LINE_AA)
-    cv2.rectangle(frame,TL_inside,BR_inside,(20,20,255),3)
-    cv2.putText(frame,"Inside box",(TL_inside[0]+10,TL_inside[1]-10),font,1,(20,255,255),3,cv2.LINE_AA)
+    # cv2.rectangle(frame,top_left,bottom_right,(20,20,255),3)
+    # cv2.putText(frame,"Inside box",(top_left[0]+10,top_left[1]-10),font,1,(20,255,255),3,cv2.LINE_AA)
     
     # Check the class of the top detected object by looking at classes[0][0].
     # If the top detected object is a cat (17) or a dog (18) (or a teddy bear (88) for test purposes),
@@ -190,62 +182,38 @@ def pet_detector(frame):
         cv2.circle(frame,(x,y), 5, (75,13,180), -1)
 
         # If object is in inside box, increment inside counter variable
-        if ((x > TL_inside[0]) and (x < BR_inside[0]) and (y > TL_inside[1]) and (y < BR_inside[1])):
+        if ((x > top_left[0]) and (x < bottom_right[0]) and (y > top_left[1]) and (y < bottom_right[1])):
             inside_counter = inside_counter + 1
 
-        # If object is in outside box, increment outside counter variable
-        if ((x > TL_outside[0]) and (x < BR_outside[0]) and (y > TL_outside[1]) and (y < BR_outside[1])):
-            outside_counter = outside_counter + 1
-
-    # If pet has been detected inside for more than 10 frames, set detected_inside flag
+    # If person has been detected inside for more than 10 frames, set detected_inside flag
     # and send a text to the phone.
     if inside_counter > 10:
-        detected_inside = True
+        detected = True
         message = client.messages.create(
-            body = 'Your pet wants outside!',
+            body = 'Person detected.',
             from_=twilio_number,
             to=my_number
             )
         inside_counter = 0
-        outside_counter = 0
-        # Pause pet detection by setting "pause" flag
-        pause = 1
-
-    # If pet has been detected outside for more than 10 frames, set detected_outside flag
-    # and send a text to the phone.
-    if outside_counter > 10:
-        detected_outside = True
-        message = client.messages.create(
-            body = 'Your pet wants inside!',
-            from_=twilio_number,
-            to=my_number
-            )
-        inside_counter = 0
-        outside_counter = 0
         # Pause pet detection by setting "pause" flag
         pause = 1
 
     # If pause flag is set, draw message on screen.
     if pause == 1:
-        if detected_inside == True:
-            cv2.putText(frame,'Pet wants outside!',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(0,0,0),7,cv2.LINE_AA)
-            cv2.putText(frame,'Pet wants outside!',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(95,176,23),5,cv2.LINE_AA)
-
-        if detected_outside == True:
-            cv2.putText(frame,'Pet wants inside!',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(0,0,0),7,cv2.LINE_AA)
-            cv2.putText(frame,'Pet wants inside!',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(95,176,23),5,cv2.LINE_AA)
+        if detected == True:
+            cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(0,0,0),7,cv2.LINE_AA)
+            cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(95,176,23),5,cv2.LINE_AA)
 
         # Increment pause counter until it reaches 30 (for a framerate of 1.5 FPS, this is about 20 seconds),
         # then unpause the application (set pause flag to 0).
         pause_counter = pause_counter + 1
-        if pause_counter > 30:
+        if pause_counter > 300:
             pause = 0
             pause_counter = 0
-            detected_inside = False
-            detected_outside = False
+            detected = False
 
     # Draw counter info
-    cv2.putText(frame,'Detection counter: ' + str(max(inside_counter,outside_counter)),(10,100),font,0.5,(255,255,0),1,cv2.LINE_AA)
+    cv2.putText(frame,'Detection counter: ' + str(inside_counter),(10,100),font,0.5,(255,255,0),1,cv2.LINE_AA)
     cv2.putText(frame,'Pause counter: ' + str(pause_counter),(10,150),font,0.5,(255,255,0),1,cv2.LINE_AA)
 
     return frame
@@ -275,7 +243,7 @@ if camera_type == 'picamera':
         frame.setflags(write=1)
 
         # Pass frame into pet detection function
-        frame = pet_detector(frame)
+        frame = person_detector(frame)
 
         # Draw FPS
         cv2.putText(frame,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),font,1,(255,255,0),2,cv2.LINE_AA)
@@ -314,7 +282,7 @@ elif camera_type == 'usb':
         ret, frame = camera.read()
 
         # Pass frame into pet detection function
-        frame = pet_detector(frame)
+        frame = person_detector(frame)
 
         # Draw FPS
         cv2.putText(frame,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),font,1,(255,255,0),2,cv2.LINE_AA)
