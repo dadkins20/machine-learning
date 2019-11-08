@@ -22,6 +22,8 @@
 # Import packages
 import os
 import cv2
+import boto3
+from PIL import Image
 import numpy as np
 from picamera.array import PiRGBArray
 from picamera import PiCamera
@@ -129,7 +131,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 top_left = (0,0)
 bottom_right = (IM_WIDTH,IM_HEIGHT)
 
-# Initialize control variables used for pet detector
+# Initialize control variables used for person detector
 detected = False
 
 inside_counter = 0
@@ -137,9 +139,11 @@ inside_counter = 0
 pause = 0
 pause_counter = 0
 
-#### Pet detection function ####
+#### Person detection function ####
 
-# This function contains the code to detect a pet, determine if it's
+s3 = boto3.resource('s3')
+
+# This function contains the code to detect a person, determine if it's
 # inside or outside, and send a text to the user's phone.
 def person_detector(frame):
 
@@ -155,7 +159,7 @@ def person_detector(frame):
         [detection_boxes, detection_scores, detection_classes, num_detections],
         feed_dict={image_tensor: frame_expanded})
 
-    # Draw the results of the detection (aka 'visulaize the results')
+    # Draw the results of the detection (aka 'visualize the results')
     vis_util.visualize_boxes_and_labels_on_image_array(
         frame,
         np.squeeze(boxes),
@@ -170,6 +174,7 @@ def person_detector(frame):
     # cv2.rectangle(frame,top_left,bottom_right,(20,20,255),3)
     # cv2.putText(frame,"Inside box",(top_left[0]+10,top_left[1]-10),font,1,(20,255,255),3,cv2.LINE_AA)
     
+
     # Check the class of the top detected object by looking at classes[0][0].
     # If the top detected object is a cat (17) or a dog (18) (or a teddy bear (88) for test purposes),
     # find its center coordinates by looking at the boxes[0][0] variable.
@@ -188,6 +193,10 @@ def person_detector(frame):
     # If person has been detected inside for more than 10 frames, set detected_inside flag
     # and send a text to the phone.
     if inside_counter > 10:
+        im = Image.fromarray(frame)
+        im.save("detected.jpeg")
+        data = open("detected.jpeg", 'rb')
+        s3.Bucket('bntech-testing').put_object(Key='detected.jpg', Body=data)
         detected = True
         message = client.messages.create(
             body = 'Person detected.',
@@ -195,7 +204,7 @@ def person_detector(frame):
             to=my_number
             )
         inside_counter = 0
-        # Pause pet detection by setting "pause" flag
+        # Pause person detection by setting "pause" flag
         pause = 1
 
     # If pause flag is set, draw message on screen.
@@ -242,7 +251,7 @@ if camera_type == 'picamera':
         frame = np.copy(frame1.array)
         frame.setflags(write=1)
 
-        # Pass frame into pet detection function
+        # Pass frame into person detection function
         frame = person_detector(frame)
 
         # Draw FPS
@@ -281,7 +290,7 @@ elif camera_type == 'usb':
         # i.e. a single-column array, where each item in the column has the pixel RGB value
         ret, frame = camera.read()
 
-        # Pass frame into pet detection function
+        # Pass frame into person detection function
         frame = person_detector(frame)
 
         # Draw FPS
