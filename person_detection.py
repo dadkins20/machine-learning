@@ -202,7 +202,7 @@ def person_detector(frame):
             'detected.jpeg', 
             'bntech-testing',
             'detected-'+timestamp+".jpg",
-            ExtraArgs={'ACL':'public-read'}
+            ExtraArgs={'ACL':'public-read','ContentType':'image/jpeg'}
             )
         
 
