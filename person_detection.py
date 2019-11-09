@@ -142,7 +142,7 @@ pause_counter = 0
 
 #### Person detection function ####
 
-s3 = boto3.resource('s3')
+s3 = boto3.client('s3')
 
 # This function contains the code to detect a person, determine if it's
 # inside or outside, and send a text to the user's phone.
@@ -198,7 +198,7 @@ def person_detector(frame):
         timestamp = datetime.datetime.today().strftime("%m%d%Y%H%M")
         im = Image.fromarray(frame)
         im.save("detected.jpeg")
-        s3.meta.upload_file(
+        s3.upload_file(
             'detected.jpg', 
             'bntech-testing',
             'detected-'+timestamp+".jpg",
