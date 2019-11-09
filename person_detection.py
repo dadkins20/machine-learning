@@ -196,7 +196,7 @@ def person_detector(frame):
     if inside_counter > 10:
         # save the image to S3
         timestamp = datetime.datetime.today().strftime("%m%d%Y%H%M")
-        im = Image.fromarray(frame_expanded)
+        im = Image.fromarray(frame)
         im.save("detected.jpeg")
         data = open("detected.jpeg", 'rb')
         s3.upload_file(
