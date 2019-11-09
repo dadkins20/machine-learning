@@ -195,7 +195,7 @@ def person_detector(frame):
     # and send a text to the phone.
     if inside_counter > 10:
         # save the image to S3
-        timestamp = datetime.datetime().now().strftime("%m%d%Y%H%M")
+        timestamp = datetime.datetime.today().strftime("%m%d%Y%H%M")
         im = Image.fromarray(frame_expanded)
         im.save("detected.jpeg")
         data = open("detected.jpeg", 'rb')
