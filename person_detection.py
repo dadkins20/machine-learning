@@ -199,7 +199,7 @@ def person_detector(frame):
         im = Image.fromarray(frame)
         im.save("detected.jpeg")
         s3.upload_file(
-            'detected.jpg', 
+            'detected.jpeg', 
             'bntech-testing',
             'detected-'+timestamp+".jpg",
             ExtraArgs={'ACL':'public-read'}
