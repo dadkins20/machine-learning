@@ -23,6 +23,7 @@
 import os
 import cv2
 import boto3
+import datetime
 from PIL import Image
 import numpy as np
 from picamera.array import PiRGBArray
@@ -193,15 +194,25 @@ def person_detector(frame):
     # If person has been detected inside for more than 10 frames, set detected_inside flag
     # and send a text to the phone.
     if inside_counter > 10:
-        im = Image.fromarray(frame)
+        # save the image to S3
+        timestamp = datetime.datetime().now().strftime("%m%d%Y%H%M")
+        im = Image.fromarray(frame_expanded)
         im.save("detected.jpeg")
         data = open("detected.jpeg", 'rb')
-        s3.Bucket('bntech-testing').put_object(Key='detected.jpg', Body=data)
+        s3.upload_file(
+            'detected.jpg', 
+            'bntech-testing',
+            'detected-'+timestamp+".jpg",
+            ExtraArgs={'ACL':'public-read'}
+            )
+        
+
         detected = True
         message = client.messages.create(
             body = 'Person detected.',
             from_=twilio_number,
-            to=my_number
+            to=my_number,
+            media_url=['https://bntech-testing.s3.amazonaws.com/detected-'+timestamp+'.jpg']
             )
         inside_counter = 0
         # Pause person detection by setting "pause" flag
