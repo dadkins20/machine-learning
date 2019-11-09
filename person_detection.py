@@ -198,8 +198,7 @@ def person_detector(frame):
         timestamp = datetime.datetime.today().strftime("%m%d%Y%H%M")
         im = Image.fromarray(frame)
         im.save("detected.jpeg")
-        data = open("detected.jpeg", 'rb')
-        s3.upload_file(
+        s3.meta.upload_file(
             'detected.jpg', 
             'bntech-testing',
             'detected-'+timestamp+".jpg",
