@@ -239,7 +239,7 @@ if camera_type == 'picamera':
     rawCapture.truncate(0)
 
     # Continuously capture frames and perform object detection on them
-    for frame1 in camera.capture_continuous(rawCapture, format="rgb",use_video_port=True):
+    for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
 
         t1 = cv2.getTickCount()
         
