@@ -169,7 +169,7 @@ def person_detector(frame):
         category_index,
         use_normalized_coordinates=True,
         line_thickness=8,
-        min_score_thresh=0.40)
+        min_score_thresh=0.50)
 
     # Draw boxes defining "outside" and "inside" locations.
     # cv2.rectangle(frame,top_left,bottom_right,(20,20,255),3)
