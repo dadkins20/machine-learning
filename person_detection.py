@@ -88,10 +88,11 @@ NUM_CLASSES = 90
 # network predicts `5`, we know that this corresponds to `airplane`.
 # Here we use internal utility functions, but anything that returns a
 # dictionary mapping integers to appropriate string labels would be fine
-# label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-# categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
-# category_index = label_map_util.create_category_index(categories)
-category_index = ['','person']
+label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
+categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
+print(categories)
+exit()
+category_index = label_map_util.create_category_index(categories)
 
 # Load the Tensorflow model into memory.
 detection_graph = tf.Graph()
