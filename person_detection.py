@@ -185,15 +185,19 @@ def person_detector(frame):
         y = int(((boxes[0][0][0]+boxes[0][0][2])/2)*IM_HEIGHT)
 
         # Draw a circle at center of object
-        cv2.circle(frame,(x,y), 5, (75,13,180), -1)
+        # cv2.circle(frame,(x,y), 5, (75,13,180), -1)
 
         # If object is in inside box, increment inside counter variable
         if ((x > top_left[0]) and (x < bottom_right[0]) and (y > top_left[1]) and (y < bottom_right[1])):
             inside_counter = inside_counter + 1
+        else:
+            inside_counter = 0
+    else:
+        inside_counter = 0
 
     # If person has been detected inside for more than 10 frames, set detected_inside flag
     # and send a text to the phone.
-    if inside_counter > 10:
+    if inside_counter > 3:
         # save the image to S3
         timestamp = datetime.datetime.today().strftime("%m%d%Y%H%M")
         im = Image.fromarray(frame)
@@ -219,9 +223,9 @@ def person_detector(frame):
 
     # If pause flag is set, draw message on screen.
     if pause == 1:
-        if detected == True:
-            cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(0,0,0),7,cv2.LINE_AA)
-            cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(95,176,23),5,cv2.LINE_AA)
+        # if detected == True:
+        #     cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(0,0,0),7,cv2.LINE_AA)
+        #     cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(95,176,23),5,cv2.LINE_AA)
 
         # Increment pause counter until it reaches 30 (for a framerate of 1.5 FPS, this is about 20 seconds),
         # then unpause the application (set pause flag to 0).
