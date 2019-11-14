@@ -171,6 +171,9 @@ def person_detector(frame):
     #     line_thickness=8,
     #     min_score_thresh=0.50)
 
+    print(classes)
+    exit()
+
     for i in range(len(boxes)):
         if classes[i] == 1 and scores[i] > .5:
             box = boxes[i]
