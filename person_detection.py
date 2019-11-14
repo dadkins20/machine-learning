@@ -220,7 +220,7 @@ def person_detector(frame):
             detected = False
 
         # Draw counter info
-        cv2.putText(frame,'Pausing 90 frames: ' + str(pause_counter),(10,100),font,0.5,(255,255,0),1,cv2.LINE_AA)
+        cv2.putText(frame,'Pausing 90 frames: ' + str(pause_counter),(30,50),font,0.5,(255,255,0),1,cv2.LINE_AA)
 
     return frame
 
@@ -241,7 +241,7 @@ if camera_type == 'picamera':
     # Continuously capture frames and perform object detection on them
     for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
 
-        t1 = cv2.getTickCount()
+        # t1 = cv2.getTickCount()
         
         # Acquire frame and expand frame dimensions to have shape: [1, None, None, 3]
         # i.e. a single-column array, where each item in the column has the pixel RGB value
@@ -252,15 +252,15 @@ if camera_type == 'picamera':
         frame = person_detector(frame)
 
         # Draw FPS
-        cv2.putText(frame,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),font,1,(255,255,0),2,cv2.LINE_AA)
+        # cv2.putText(frame,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),font,1,(255,255,0),2,cv2.LINE_AA)
 
         # All the results have been drawn on the frame, so it's time to display it.
         cv2.imshow('Object detector', frame)
 
         # FPS calculation
-        t2 = cv2.getTickCount()
-        time1 = (t2-t1)/freq
-        frame_rate_calc = 1/time1
+        # t2 = cv2.getTickCount()
+        # time1 = (t2-t1)/freq
+        # frame_rate_calc = 1/time1
 
         # Press 'q' to quit
         if cv2.waitKey(1) == ord('q'):
