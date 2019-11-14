@@ -78,7 +78,7 @@ CWD_PATH = os.getcwd()
 PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
 
 # Path to label map file
-PATH_TO_LABELS = os.path.join(CWD_PATH,'data','mscoco_label_map.pbtxt')
+PATH_TO_LABELS = os.path.join(CWD_PATH,'data','mscoco_label_map_person.pbtxt')
 
 # Number of classes the object detector can identify
 NUM_CLASSES = 90
@@ -90,7 +90,7 @@ NUM_CLASSES = 90
 # dictionary mapping integers to appropriate string labels would be fine
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
-categories = list(filter(lambda c: c['id'] in [1], categories))
+# categories = list(filter(lambda c: c['id'] in [1], categories))
 category_index = label_map_util.create_category_index(categories)
 
 # Load the Tensorflow model into memory.
