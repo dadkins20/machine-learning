@@ -180,7 +180,8 @@ def person_detector(frame):
     # If the top detected object is a cat (17) or a dog (18) (or a teddy bear (88) for test purposes),
     # find its center coordinates by looking at the boxes[0][0] variable.
     # boxes[0][0] variable holds coordinates of detected objects as (ymin, xmin, ymax, xmax)
-    if (((int(classes[0][0]) == 1) ) and (pause == 0)):
+    if ( (pause == 0) and ( len(filter(lambda x:x== 1, classes[0])) > 0 ) ):
+    # if (((int(classes[0][0]) == 1) ) and (pause == 0)):
         x = int(((boxes[0][0][1]+boxes[0][0][3])/2)*IM_WIDTH)
         y = int(((boxes[0][0][0]+boxes[0][0][2])/2)*IM_HEIGHT)
 
@@ -230,13 +231,13 @@ def person_detector(frame):
         # Increment pause counter until it reaches 30 (for a framerate of 1.5 FPS, this is about 20 seconds),
         # then unpause the application (set pause flag to 0).
         pause_counter = pause_counter + 1
-        if pause_counter > 300:
+        if pause_counter > 90:
             pause = 0
             pause_counter = 0
             detected = False
 
     # Draw counter info
-    cv2.putText(frame,'Detection counter: ' + str(inside_counter),(10,100),font,0.5,(255,255,0),1,cv2.LINE_AA)
+    # cv2.putText(frame,'Detection counter: ' + str(inside_counter),(10,100),font,0.5,(255,255,0),1,cv2.LINE_AA)
     cv2.putText(frame,'Pause counter: ' + str(pause_counter),(10,150),font,0.5,(255,255,0),1,cv2.LINE_AA)
 
     return frame
