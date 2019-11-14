@@ -171,11 +171,11 @@ def person_detector(frame):
     #     line_thickness=8,
     #     min_score_thresh=0.50)
 
-    print(classes)
+    print(boxes)
     exit()
 
     for i in range(len(boxes)):
-        if classes[i] == 1 and scores[i] > .5:
+        if classes[0][i] == 1 and scores[i] > .5:
             box = boxes[i]
             cv2.rectangle(frame,(box[1], box[0]),(box[3],box[2]),(255,0,0),8)
 
