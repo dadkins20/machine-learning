@@ -161,38 +161,19 @@ def person_detector(frame):
         feed_dict={image_tensor: frame_expanded})
 
     # Draw the results of the detection (aka 'visualize the results')
-    # vis_util.visualize_boxes_and_labels_on_image_array(
-    #     frame,
-    #     np.squeeze(boxes),
-    #     np.squeeze(classes).astype(np.int32),
-    #     np.squeeze(scores),
-    #     category_index,
-    #     use_normalized_coordinates=True,
-    #     line_thickness=8,
-    #     min_score_thresh=0.50)
-
     for i in range(len(boxes[0])):
         if classes[0][i] == 1 and scores[0][i] > .5:
             box = boxes[0][i]
             y1, x1, y2, x2 = int(box[0]*IM_HEIGHT),int(box[1]*IM_WIDTH),int(box[2]*IM_HEIGHT),int(box[3]*IM_WIDTH)
-            cv2.rectangle(frame,(x1, y1),(x2,y2),(255,0,0),3)
-
-    # Draw boxes defining "outside" and "inside" locations.
-    # cv2.rectangle(frame,top_left,bottom_right,(20,20,255),3)
-    # cv2.putText(frame,"Inside box",(top_left[0]+10,top_left[1]-10),font,1,(20,255,255),3,cv2.LINE_AA)
-    
+            cv2.rectangle(frame,(x1, y1),(x2,y2),(255,0,0),3)   
 
     # Check the class of the top detected object by looking at classes[0][0].
-    # If the top detected object is a cat (17) or a dog (18) (or a teddy bear (88) for test purposes),
+    # If the top detected object is a person (1),
     # find its center coordinates by looking at the boxes[0][0] variable.
     # boxes[0][0] variable holds coordinates of detected objects as (ymin, xmin, ymax, xmax)
-    # if ( (pause == 0) and ( 1 in classes[0] ) ):
     if (((int(classes[0][0]) == 1) ) and (pause == 0)):
         x = int(((boxes[0][0][1]+boxes[0][0][3])/2)*IM_WIDTH)
         y = int(((boxes[0][0][0]+boxes[0][0][2])/2)*IM_HEIGHT)
-
-        # Draw a circle at center of object
-        # cv2.circle(frame,(x,y), 5, (75,13,180), -1)
 
         # If object is in inside box, increment inside counter variable
         if ((x > top_left[0]) and (x < bottom_right[0]) and (y > top_left[1]) and (y < bottom_right[1])):
@@ -230,10 +211,6 @@ def person_detector(frame):
 
     # If pause flag is set, draw message on screen.
     if pause == 1:
-        # if detected == True:
-        #     cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(0,0,0),7,cv2.LINE_AA)
-        #     cv2.putText(frame,'Person detected',(int(IM_WIDTH*.1),int(IM_HEIGHT*.5)),font,3,(95,176,23),5,cv2.LINE_AA)
-
         # Increment pause counter until it reaches 30 (for a framerate of 1.5 FPS, this is about 20 seconds),
         # then unpause the application (set pause flag to 0).
         pause_counter = pause_counter + 1
@@ -242,9 +219,8 @@ def person_detector(frame):
             pause_counter = 0
             detected = False
 
-    # Draw counter info
-    # cv2.putText(frame,'Detection counter: ' + str(inside_counter),(10,100),font,0.5,(255,255,0),1,cv2.LINE_AA)
-    cv2.putText(frame,'Pause counter: ' + str(pause_counter),(10,150),font,0.5,(255,255,0),1,cv2.LINE_AA)
+        # Draw counter info
+        cv2.putText(frame,'Pausing 90 frames: ' + str(pause_counter),(10,100),font,0.5,(255,255,0),1,cv2.LINE_AA)
 
     return frame
 
