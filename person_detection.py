@@ -181,8 +181,8 @@ def person_detector(frame):
     # If the top detected object is a cat (17) or a dog (18) (or a teddy bear (88) for test purposes),
     # find its center coordinates by looking at the boxes[0][0] variable.
     # boxes[0][0] variable holds coordinates of detected objects as (ymin, xmin, ymax, xmax)
-    if ( (pause == 0) and ( 1 in classes[0] ) ):
-    # if (((int(classes[0][0]) == 1) ) and (pause == 0)):
+    # if ( (pause == 0) and ( 1 in classes[0] ) ):
+    if (((int(classes[0][0]) == 1) ) and (pause == 0)):
         x = int(((boxes[0][0][1]+boxes[0][0][3])/2)*IM_WIDTH)
         y = int(((boxes[0][0][0]+boxes[0][0][2])/2)*IM_HEIGHT)
 
