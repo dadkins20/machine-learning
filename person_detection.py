@@ -78,7 +78,7 @@ CWD_PATH = os.getcwd()
 PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
 
 # Path to label map file
-PATH_TO_LABELS = os.path.join(CWD_PATH,'data','mscoco_label_map_person.pbtxt')
+PATH_TO_LABELS = os.path.join(CWD_PATH,'data','mscoco_label_map.pbtxt')
 
 # Number of classes the object detector can identify
 NUM_CLASSES = 90
@@ -90,7 +90,6 @@ NUM_CLASSES = 90
 # dictionary mapping integers to appropriate string labels would be fine
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
-# categories = list(filter(lambda c: c['id'] in [1], categories))
 category_index = label_map_util.create_category_index(categories)
 
 # Load the Tensorflow model into memory.
@@ -162,15 +161,20 @@ def person_detector(frame):
         feed_dict={image_tensor: frame_expanded})
 
     # Draw the results of the detection (aka 'visualize the results')
-    vis_util.visualize_boxes_and_labels_on_image_array(
-        frame,
-        np.squeeze(boxes),
-        np.squeeze(classes).astype(np.int32),
-        np.squeeze(scores),
-        category_index,
-        use_normalized_coordinates=True,
-        line_thickness=8,
-        min_score_thresh=0.50)
+    # vis_util.visualize_boxes_and_labels_on_image_array(
+    #     frame,
+    #     np.squeeze(boxes),
+    #     np.squeeze(classes).astype(np.int32),
+    #     np.squeeze(scores),
+    #     category_index,
+    #     use_normalized_coordinates=True,
+    #     line_thickness=8,
+    #     min_score_thresh=0.50)
+
+    for i in range(len(boxes)):
+        if classes[i] == 1 and scores[i] > .5:
+            box = boxes[1]
+            cv2.rectangle(frame,(box[1], box[0]),(box[3],box[2]),(255,0,0),8)
 
     # Draw boxes defining "outside" and "inside" locations.
     # cv2.rectangle(frame,top_left,bottom_right,(20,20,255),3)
