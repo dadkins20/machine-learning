@@ -90,7 +90,7 @@ NUM_CLASSES = 90
 # dictionary mapping integers to appropriate string labels would be fine
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
-list(filter(lambda categories: categories['id'] == 1))
+list(filter(lambda c: c['id'] == 1, categories))
 print(categories)
 exit()
 category_index = label_map_util.create_category_index(categories)
