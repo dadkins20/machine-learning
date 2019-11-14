@@ -174,8 +174,8 @@ def person_detector(frame):
     for i in range(len(boxes[0])):
         if classes[0][i] == 1 and scores[0][i] > .5:
             box = boxes[0][i]
-            print(int(box[0]*IM_WIDTH)," ",int(box[1]*IM_HEIGHT)," ",int(box[2]*IM_WIDTH)," ",int(box[3]*IM_HEIGHT))
-            cv2.rectangle(frame,(box[1], box[0]),(box[3],box[2]),(255,0,0),3)
+            y1, x1, y2, x2 = int(box[0]*IM_HEIGHT),int(box[1]*IM_WIDTH),int(box[2]*IM_HEIGHT),int(box[3]*IM_WIDTH)
+            cv2.rectangle(frame,(x1, y1),(x2,y2),(255,0,0),3)
 
     # Draw boxes defining "outside" and "inside" locations.
     # cv2.rectangle(frame,top_left,bottom_right,(20,20,255),3)
