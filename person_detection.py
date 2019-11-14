@@ -234,12 +234,12 @@ if camera_type == 'picamera':
     # Initialize Picamera and grab reference to the raw capture
     camera = PiCamera()
     camera.resolution = (IM_WIDTH,IM_HEIGHT)
-    camera.framerate = 10
+    camera.framerate = 1
     rawCapture = PiRGBArray(camera, size=(IM_WIDTH,IM_HEIGHT))
     rawCapture.truncate(0)
 
     # Continuously capture frames and perform object detection on them
-    for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
+    for frame1 in camera.capture_continuous(rawCapture, format="rgb",use_video_port=True):
 
         t1 = cv2.getTickCount()
         
