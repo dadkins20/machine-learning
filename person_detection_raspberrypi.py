@@ -192,8 +192,8 @@ def person_detector(frame):
         im.save("detected.jpeg")
         s3.upload_file(
             'detected.jpeg', 
-            'bntech-testing',
-            'detected-'+timestamp+".jpg",
+            'deeplens-sagemaker-davidadkins',
+            'detected-rpi-'+timestamp+".jpg",
             ExtraArgs={'ACL':'public-read','ContentType':'image/jpeg'}
             )
         
@@ -203,7 +203,7 @@ def person_detector(frame):
             body = 'Person detected.',
             from_=twilio_number,
             to=my_number,
-            media_url=['https://bntech-testing.s3.amazonaws.com/detected-'+timestamp+'.jpg']
+            media_url=['https://deeplens-sagemaker-davidadkins.s3.amazonaws.com/detected-rpi-'+timestamp+'.jpg']
             )
         inside_counter = 0
         # Pause person detection by setting "pause" flag
